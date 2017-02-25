@@ -3,6 +3,8 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
+import gifAnimation.*; 
+
 import java.util.HashMap; 
 import java.util.ArrayList; 
 import java.io.File; 
@@ -15,35 +17,167 @@ import java.io.IOException;
 public class MainView extends PApplet {
 
 
+
+
 PFont font;
 PImage background;
 PImage choiceImage;
+Gif loadingGIF;
 
-Button b0, b1, b2, b3, b4, b5, bMenu;
-Drink drink0, drink1, drink2, drink3, drink4, drink5, drinkMenu;
+Button b0, b1, b2, b3, b4, b5, backB, makeB;
+Drink drink0, drink1, drink2, drink3, drink4, drink5;
 Drink choice;
-boolean selection = false;
-int x = 1200, count = 0;
+boolean drinkMenu = false, loadScreen = false;
+int x = 1200, count = 0, temp = 0;
+int basicBC = color(255,255,255,175), menuBC = color(50,120,255,255);
 
-String bottle0 = "Rum:    ", bottle1 = "Gin:     ", bottle2 = "Whiskey:", bottle3 = "Coke:   ", bottle4 = "Tonic:  ";
+static final String bottle0 = "Rum", bottle1 = "Gin", bottle2 = "Whiskey", bottle3 = "Coke", bottle4 = "Tonic";
 
 public void setup() {
   
-  background = loadImage("include/blur2.png");
+  background = loadImage("assets/blur2.png");
   font = createFont("Segoe UI", 15);
+  loadingGIF = new Gif(this, "assets/loading.gif");
+  loadingGIF.play();
   frameRate(60);
+  textAlign(CENTER);
+  imageMode(CENTER);
 
-  drink0 = new Drink("Drink 0","include/cup1.png",100,100,175,250, "include/G&T.txt", 100);
-  drink1 = new Drink("Drink 1","include/cup1.png",400,100,175,250, "include/G&T.txt", 100);
-  drink2 = new Drink("Drink 2","include/cup1.png",700,100,175,250, "include/G&T.txt", 100);
-  drink3 = new Drink("Drink 3","include/cup1.png",100,450,175,250, "include/G&T.txt", 100);
-  drink4 = new Drink("Drink 4","include/cup1.png",400,450,175,250, "include/G&T.txt", 100);
-  drink5 = new Drink("Drink 5","include/cup1.png",700,450,175,250, "include/G&T.txt", 100);
+  drink0 = new Drink("assets/cup1.png",100,100,175,250, "assets/G&T.txt", basicBC);
+  drink1 = new Drink("assets/cup1.png",400,100,175,250, "assets/awfulDrink.txt", basicBC);
+  drink2 = new Drink("assets/cup1.png",700,100,175,250, "assets/G&T.txt", basicBC);
+  drink3 = new Drink("assets/cup1.png",100,450,175,250, "assets/G&T.txt", basicBC);
+  drink4 = new Drink("assets/cup1.png",400,450,175,250, "assets/G&T.txt", basicBC);
+  drink5 = new Drink("assets/cup1.png",700,450,175,250, "assets/G&T.txt", basicBC);
  }
 
 public void draw() {
 
-  image(background,0 ,0);
+  init();
+
+  if(drinkMenu){
+    drawDrinkMenu(choice);
+  }
+  if(loadScreen && x < -1000){
+    drawLoadScreen();
+    temp++;
+  }
+  if(temp > 500){
+    loadScreen = false;
+    drinkMenu = false;
+    x = 1200;
+    count = 0;
+    temp = 0;
+  }
+
+}
+
+public void mouseClicked(){
+
+  if(b0.check_click() && !drinkMenu && !loadScreen){
+      print("Drink 0 Selected\n");
+      drinkMenu= true;
+      choice = drink0;
+  }
+  if(b1.check_click() && !drinkMenu && !loadScreen){
+      print("Drink 1 Selected\n");
+      drinkMenu= true;
+      choice = drink1;
+  }
+  if(b2.check_click() && !drinkMenu && !loadScreen){
+      print("Drink 2 Selected\n");
+      drinkMenu= true;
+      choice = drink2;
+  }
+  if(b3.check_click() && !drinkMenu && !loadScreen){
+      print("Drink 3 Selected\n");
+      drinkMenu= true;
+      choice = drink3;
+  }
+  if(b4.check_click() && !drinkMenu && !loadScreen){
+      print("Drink 4 Selected\n");
+      drinkMenu= true;
+      choice = drink4;
+  }
+  if(b5.check_click() && !drinkMenu && !loadScreen){
+      print("Drink 5 Selected\n");
+      drinkMenu= true;
+      choice = drink5;
+  }
+  if(backB.check_click()){
+      print("Back B Selected\n");
+      drinkMenu= false;
+      x = 1200;
+      count = 0;
+  }
+  if(makeB.check_click()){
+      print("Make B Selected\n");
+      count = 0;
+      loadScreen = true;
+
+      /*Send Drinks*/
+
+      //Send choice.bottleNum
+      for(int i = 0; i < choice.recipeOrder.length; i++){
+        if(choice.recipeOrder[i] > 0){
+          //Send i
+          //Send choice.recipeOrder
+        }
+      }
+  }
+}
+
+public void drawDrinkMenu(Drink choice){
+  if(count == 0){
+    choiceImage = loadImage(choice.imgPath);
+    choiceImage.resize(250,300);
+  }
+  if(count < 23 && !loadScreen){
+    x = x - 50;
+    count++;
+  }else if(count < 23 && loadScreen){
+    x = x - 50;
+    count++;
+  }
+
+  //Fade Out Screen
+  fill(0,0,0,count*2);
+  rect(0,0,1000,800);
+
+  //Drink Background, and Drink
+  fill(255,255,255,200);
+  rect(x,100,400,610,7);
+  image(choiceImage, x + 200, 300);
+
+  //Drink Title
+  fill(0);
+  textFont(createFont("Segoe UI", 35));
+  text(choice.name, x + 200 , 600);
+
+  //Recipe Background
+  fill(0,0,0,200);
+  rect(x + 400,100, 500, 610, 7);
+
+  //Recipe Ingredient List
+  fill(255);
+  textFont(createFont("Segoe UI", 25));
+  text(choice.recipe, x + 650, 175);
+
+  //Recipe Description
+  fill(255);
+  textFont(createFont("Segoe UI", 20));
+  text(choice.description, x + 650, 250 + 40*choice.bottleNum);
+
+  backB.setPosition(x + 430, 650);
+  backB.show();
+
+  makeB.setPosition(x + 770, 650);
+  makeB.show();
+
+}
+
+public void init(){
+  image(background,500 ,400);
 
   b0 = drink0.getButton();
   b0.show();
@@ -63,76 +197,24 @@ public void draw() {
   b5 = drink5.getButton();
   b5.show();
 
-  if(selection){
-    drinkMenu(choice);
-  }else{
-    selection = false;
-  }
-
+  backB = new Button(x, 650, 100, 50, "Back", menuBC, createFont("Segoe UI", 15));
+  makeB = new Button(x, 650, 100, 50, "Make", menuBC, createFont("Segoe UI", 15));
 
 }
 
-public void mouseClicked(){
-
-  if(b0.check_click()){
-      print("Drink 0 Selected\n");
-      selection = true;
-      choice = drink0;
+public void drawLoadScreen(){
+  if(count < 50){
+    count += 3;
   }
-  if(b1.check_click()){
-      print("Drink 1 Selected\n");
-      selection = true;
-      choice = drink1;
-  }
-  if(b2.check_click()){
-      print("Drink 2 Selected\n");
-      selection = true;
-      choice = drink2;
-  }
-  if(b3.check_click()){
-      print("Drink 3 Selected\n");
-      selection = true;
-      choice = drink3;
-  }
-  if(b4.check_click()){
-      print("Drink 4 Selected\n");
-      selection = true;
-      choice = drink4;
-  }
-  if(b5.check_click()){
-      print("Drink 5 Selected\n");
-      selection = true;
-      choice = drink5;
-  }
-}
-
-public void drinkMenu(Drink choice){
-  if(count == 0){
-    choiceImage = loadImage(choice.imgPath);
-    choiceImage.resize(250,300);
-  }
-  if(count < 77){
-    x = x - 15;
-    count++;
-  }
-
-  fill(0,0,0,count*2);
+  fill(0,0,0,count*4);
   rect(0,0,1000,800);
 
-  fill(255,255,255);
-  rect(x,100,400,610,7);
-  image(choiceImage, x + 80, 150);
-
-  fill(0);
-  textFont(createFont("Segoe UI", 35));
-  text(choice.name, x + 140 , 600);
-
-  fill(0,0,0,150);
-  rect(x + 400,100, 500, 610, 7);
-
+  //Loading Message
   fill(255);
-  textFont(createFont("Segoe UI", 25));
-  text(choice.recipe, x + 450 , 175);
+  textFont(createFont("Segoe UI", 65));
+  text("Making Drink, Please Wait", 500, 250);
+
+  image(loadingGIF,500,550);
 
 }
 
@@ -141,6 +223,7 @@ class Button{
  float x,y,w,h;
  String txt;
  PImage img;
+ PFont xfont;
  int clr;
 
  Button(float x, float y, float w, float h, String txt, PImage img, int clr){
@@ -153,21 +236,45 @@ class Button{
     this.clr = clr;
  }
 
+ Button(float x, float y, float w, float h, String txt, int clr, PFont xfont){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.txt = txt;
+    this.clr = clr;
+    this.xfont = xfont;
+ }
+
  public void show(){
     //rectMode(CENTER);
-    fill(255,255,255,clr);
-    //noStroke();
+    fill(this.clr);
+    noStroke();
     rect(x,y,w,h,7);
-    image(img, x + w/4 , y+ h/8 ,w/2,h/2);
+    if(img != null){
+      image(img, x + w/2 , y+ h/2 ,w/2,h/2);
+    }
 
-    fill(0);
-    textFont(font);
-    //textAlign(LEFT, BASELINE);
-    text(txt, x + w/3 ,y + h*7/8.0f );
+    if(xfont == null){
+      fill(0);
+      textFont(font);
+    //  textAlign(CENTER);
+      text(txt, x + w/2 ,y + h*7/8.0f );
+    }else{
+      fill(255);
+      textFont(xfont);
+      text(txt, x + w/2 ,y + 5*h/8.0f );
+    }
+
  }
 
  public boolean check_click(){
    return (mouseX > (x) && mouseX < (x + w) && mouseY > (y) && mouseY < (y +h));
+ }
+
+ public void setPosition(float x, float y){
+   this.x = x;
+   this.y = y;
  }
 
 }
@@ -175,13 +282,13 @@ class Button{
 class Drink{
     PImage img;
     BufferedReader input;
-    String name, imgPath, recipePath, recipe;
+    String name, imgPath, recipePath, recipe, description = "";
     float x,y,w,h;
+    int bottleNum;
     int clr;
     int[] recipeOrder = new int[5];
 
-    Drink(String name, String imgPath, float x, float y, float w, float h, String recipePath, int clr){
-      this.name = name;
+    Drink(String imgPath, float x, float y, float w, float h, String recipePath, int clr){
       this.img = loadImage(imgPath);
       this.input = createReader(recipePath);
       this.x = x;
@@ -191,48 +298,88 @@ class Drink{
       this.clr = clr;
       this.imgPath = imgPath;
 
-      this.recipe = getRecipe();
+      getRecipe();
     }
 
     public Button getButton(){
       return new Button(x, y, w, h, name, img, clr);
     }
 
-    public String getRecipe(){
-      String line, out = "               Recipe               \n";
+    public void getRecipe(){
+      String line, out = "                    Recipe\n";
       String[] sLine;
-      int bChoice;
+      String bChoice, tempLine = "";
+      boolean recipeRead = false;
+      int choiceN = -1, length = 0, j = 0;
 
       try{
+        this.name = input.readLine();
         while((line = input.readLine()) != null){
-            sLine = split(line, " ");
-            bChoice = PApplet.parseInt(sLine[1].substring(0,1));
 
-            switch(bChoice){
-              case 0: recipeOrder[0] = recipeOrder[0] + PApplet.parseInt(sLine[2]);
-                      out = out + bottle0 + "                              " + recipeOrder[0] + "oz\n";
-                      break;
-              case 1: recipeOrder[1] = recipeOrder[1] + PApplet.parseInt(sLine[2]);
-                      out = out + bottle1 + "                              " + recipeOrder[1] + "oz\n";
-                      break;
-              case 2: recipeOrder[2] = recipeOrder[2] + PApplet.parseInt(sLine[2]);
-                      out = out + bottle2 + "                              " + recipeOrder[2] + "oz\n";
-                      break;
-              case 3: recipeOrder[3] = recipeOrder[3] + PApplet.parseInt(sLine[2]);
-                      out = out + bottle3 + "                              " + recipeOrder[3] + "oz\n";
-                      break;
-              case 4: recipeOrder[4] = recipeOrder[4] + PApplet.parseInt(sLine[2]);
-                      out = out + bottle4 + "                              " + recipeOrder[4] + "oz\n";
-                      break;
-              default:
-                print("Error on Parse on Recipe File");
-                break;
+            if(line.contains("Description:")){
+              recipeRead = true;
+              this.description += "Description:\n";
+              continue;
+            }
+
+            if(recipeRead){
+              sLine = split(line, " ");
+
+              while(j != sLine.length){
+                tempLine += sLine[j] + " ";
+                j++;
+                if(tempLine.length() > 40){
+                  this.description += tempLine + "\n";
+                  tempLine = "";
+                }
+              }
+              this.description += tempLine;
+              j = 0;
+
+            }else if((sLine = split(line, " ")).length > 0){
+              bChoice = sLine[0];
+
+              switch(bChoice){
+                case bottle0: recipeOrder[0] = recipeOrder[0] + PApplet.parseInt(sLine[2]);
+                        out = out + bottle0;
+                        length = bottle0.length();
+                        choiceN= 0;
+                        break;
+                case bottle1: recipeOrder[1] = recipeOrder[1] + PApplet.parseInt(sLine[2]);
+                        out = out + bottle1 + ":";
+                        length = bottle1.length() - 1;
+                        choiceN= 1;
+                        break;
+                case bottle2: recipeOrder[2] = recipeOrder[2] + PApplet.parseInt(sLine[2]);
+                        out = out + bottle2  + ":";
+                        length = bottle2.length() + 2;
+                        choiceN= 2;
+                        break;
+                case bottle3: recipeOrder[3] = recipeOrder[3] + PApplet.parseInt(sLine[2]);
+                        out = out + bottle3  + ":";
+                        length = bottle3.length();
+                        choiceN= 3;
+                        break;
+                case bottle4: recipeOrder[4] = recipeOrder[4] + PApplet.parseInt(sLine[2]);
+                        out = out + bottle4 + ":";
+                        length = bottle4.length();
+                        choiceN= 4;
+                        break;
+                default:
+                continue;
+              }
+
+              for(int i = 0; i < 40 - length; i++){
+                out += " ";
+              }
+              out +=  recipeOrder[choiceN] + "oz\n";
+              bottleNum++;
             }
         }
       }catch(Exception e){
         e.printStackTrace();
       }
-      return out;
+      this.recipe = out;
     }
 }
   public void settings() {  size(1000, 800); }

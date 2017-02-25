@@ -1,0 +1,10 @@
+Awful Drink
+Gin : 2
+Tonic : 5
+Rum : 2
+Whiskey : 2
+Coke : 1
+
+Description:
+If James could be a mixed drink this would be it. With Gin, Rum, Whiskey, Tonic, and
+Coke it's a long island from hell. Enjoy with extreme caution.

@@ -2,13 +2,13 @@
 class Drink{
     PImage img;
     BufferedReader input;
-    String name, imgPath, recipePath, recipe;
+    String name, imgPath, recipePath, recipe, description = "";
     float x,y,w,h;
-    int clr;
+    int bottleNum;
+    color clr;
     int[] recipeOrder = new int[5];
 
-    Drink(String name, String imgPath, float x, float y, float w, float h, String recipePath, int clr){
-      this.name = name;
+    Drink(String imgPath, float x, float y, float w, float h, String recipePath, color clr){
       this.img = loadImage(imgPath);
       this.input = createReader(recipePath);
       this.x = x;
@@ -18,47 +18,87 @@ class Drink{
       this.clr = clr;
       this.imgPath = imgPath;
 
-      this.recipe = getRecipe();
+      getRecipe();
     }
 
     Button getButton(){
       return new Button(x, y, w, h, name, img, clr);
     }
 
-    String getRecipe(){
-      String line, out = "               Recipe               \n";
+    void getRecipe(){
+      String line, out = "                    Recipe\n";
       String[] sLine;
-      int bChoice;
+      String bChoice, tempLine = "";
+      boolean recipeRead = false;
+      int choiceN = -1, length = 0, j = 0;
 
       try{
+        this.name = input.readLine();
         while((line = input.readLine()) != null){
-            sLine = split(line, " ");
-            bChoice = int(sLine[1].substring(0,1));
 
-            switch(bChoice){
-              case 0: recipeOrder[0] = recipeOrder[0] + int(sLine[2]);
-                      out = out + bottle0 + "                              " + recipeOrder[0] + "oz\n";
-                      break;
-              case 1: recipeOrder[1] = recipeOrder[1] + int(sLine[2]);
-                      out = out + bottle1 + "                              " + recipeOrder[1] + "oz\n";
-                      break;
-              case 2: recipeOrder[2] = recipeOrder[2] + int(sLine[2]);
-                      out = out + bottle2 + "                              " + recipeOrder[2] + "oz\n";
-                      break;
-              case 3: recipeOrder[3] = recipeOrder[3] + int(sLine[2]);
-                      out = out + bottle3 + "                              " + recipeOrder[3] + "oz\n";
-                      break;
-              case 4: recipeOrder[4] = recipeOrder[4] + int(sLine[2]);
-                      out = out + bottle4 + "                              " + recipeOrder[4] + "oz\n";
-                      break;
-              default:
-                print("Error on Parse on Recipe File");
-                break;
+            if(line.contains("Description:")){
+              recipeRead = true;
+              this.description += "Description:\n";
+              continue;
+            }
+
+            if(recipeRead){
+              sLine = split(line, " ");
+
+              while(j != sLine.length){
+                tempLine += sLine[j] + " ";
+                j++;
+                if(tempLine.length() > 40){
+                  this.description += tempLine + "\n";
+                  tempLine = "";
+                }
+              }
+              this.description += tempLine;
+              j = 0;
+
+            }else if((sLine = split(line, " ")).length > 0){
+              bChoice = sLine[0];
+
+              switch(bChoice){
+                case bottle0: recipeOrder[0] = recipeOrder[0] + int(sLine[2]);
+                        out = out + bottle0;
+                        length = bottle0.length();
+                        choiceN= 0;
+                        break;
+                case bottle1: recipeOrder[1] = recipeOrder[1] + int(sLine[2]);
+                        out = out + bottle1 + ":";
+                        length = bottle1.length() - 1;
+                        choiceN= 1;
+                        break;
+                case bottle2: recipeOrder[2] = recipeOrder[2] + int(sLine[2]);
+                        out = out + bottle2  + ":";
+                        length = bottle2.length() + 2;
+                        choiceN= 2;
+                        break;
+                case bottle3: recipeOrder[3] = recipeOrder[3] + int(sLine[2]);
+                        out = out + bottle3  + ":";
+                        length = bottle3.length();
+                        choiceN= 3;
+                        break;
+                case bottle4: recipeOrder[4] = recipeOrder[4] + int(sLine[2]);
+                        out = out + bottle4 + ":";
+                        length = bottle4.length();
+                        choiceN= 4;
+                        break;
+                default:
+                continue;
+              }
+
+              for(int i = 0; i < 40 - length; i++){
+                out += " ";
+              }
+              out +=  recipeOrder[choiceN] + "oz\n";
+              bottleNum++;
             }
         }
       }catch(Exception e){
         e.printStackTrace();
       }
-      return out;
+      this.recipe = out;
     }
 }
