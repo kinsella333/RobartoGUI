@@ -31,7 +31,7 @@ void setup() {
   textAlign(CENTER);
   imageMode(CENTER);
 
-  //port = new Serial(this, "COM3", 115200);
+  port = new Serial(this, "COM3", 115200);
 
   drink0 = new Drink("assets/G&T.png",100,100,175,250, "assets/G&T.txt", basicBC);
   drink1 = new Drink("assets/collegeLongIsland.png",400,100,175,250, "assets/collegeLongIsland.txt", basicBC);
@@ -67,7 +67,7 @@ void draw() {
   if(byoMenu){
     drawBYO();
   }
-/*
+
   if(port.available() > 0){
     char c = port.readChar();
 
@@ -79,6 +79,7 @@ void draw() {
       case CMD_COMPLETE:
       loadScreen = false;
       drinkMenu = false;
+      byoMenu = false;
       x = 1200;
       count = 0;
       temp = 0;
@@ -90,11 +91,10 @@ void draw() {
   }
   if(millis() - last_heartbeat > 1500){
       connected = false;
-      //print("Connection lost\n");
   }else{
     connected = true;
   }
-*/
+
 }
 
 void mouseClicked(){
@@ -135,14 +135,14 @@ void mouseClicked(){
       count = 0;
       loadScreen = true;
 
-      /*port.write(CMD_RECIPE);
+      port.write(CMD_RECIPE);
       port.write(choice.bottleNum);
       for(int i = 0; i < choice.recipeOrder.length; i++){
         if(choice.recipeOrder[i] > 0){
           port.write(i);
           port.write(choice.recipeOrder[i]);
         }
-      }*/
+      }
   }
 
   //BYO Menu Buttons
@@ -263,15 +263,17 @@ void mouseClicked(){
     count = 0;
     loadScreen = true;
     choice = drink5;
+    choice.getTotalOz();
 
-    /*port.write(CMD_RECIPE);
+    port.write(CMD_RECIPE);
     port.write(choice.bottleNum);
+    print(choice.bottleNum);
     for(int i = 0; i < choice.recipeOrder.length; i++){
       if(choice.recipeOrder[i] > 0){
         port.write(i);
         port.write(choice.recipeOrder[i]);
       }
-    }*/
+    }
   }
 }
 

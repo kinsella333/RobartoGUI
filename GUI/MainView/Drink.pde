@@ -93,8 +93,13 @@ class Drink{
 
     int getTotalOz(){
       totaloz = 0;
+      bottleNum = 0;
       for(int i =  0; i < 5; i++){
         totaloz += recipeOrder[i];
+
+        if(recipeOrder[i] > 0){
+          bottleNum++;
+        }
       }
       return totaloz;
     }
