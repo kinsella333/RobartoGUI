@@ -4,7 +4,7 @@ class Drink{
     BufferedReader input;
     String name, imgPath, recipePath, recipe, description = "";
     float x,y,w,h;
-    int bottleNum;
+    int bottleNum, totaloz;
     color clr;
     int[] recipeOrder = new int[5];
 
@@ -89,5 +89,13 @@ class Drink{
         e.printStackTrace();
       }
       this.recipe = out;
+    }
+
+    int getTotalOz(){
+      totaloz = 0;
+      for(int i =  0; i < 5; i++){
+        totaloz += recipeOrder[i];
+      }
+      return totaloz;
     }
 }

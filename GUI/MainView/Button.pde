@@ -57,4 +57,8 @@ class Button{
    this.y = y;
  }
 
+ void setColor(color c){
+   this.clr = c;
+ }
+
 }
