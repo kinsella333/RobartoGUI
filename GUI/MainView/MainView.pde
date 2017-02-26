@@ -373,9 +373,11 @@ void drawBYO(){
     count++;
   }
 
-  //Fade Out Screen
-  fill(0,0,0,count*4 + 100);
-  rect(0,0,1000,800);
+  if(!loadScreen){
+    //Fade Out Screen
+    fill(0,0,0,count*10);
+    rect(0,0,1000,800);
+  }
 
   rumB.setPosition(x, 100);
   ginB.setPosition(x, 200);
