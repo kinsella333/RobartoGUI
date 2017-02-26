@@ -1,0 +1,13 @@
+College Long Island
+Gin : 2
+Tonic : 5
+Rum : 2
+Whiskey : 2
+Coke : 1
+
+Description:
+Sometimes called the "Longer Island", this
+cocktail will leave you wandering a Denny's
+parking lot in Northern Alaska at 3am. With
+Gin, Rum, Whiskey, Tonic, and Coke it's a long
+island from hell. Enjoy with extreme caution.

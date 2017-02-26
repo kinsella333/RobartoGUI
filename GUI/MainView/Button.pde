@@ -33,13 +33,12 @@ class Button{
     noStroke();
     rect(x,y,w,h,7);
     if(img != null){
-      image(img, x + w/2 , y+ h/2 ,w/2,h/2);
+      image(img, x + w/2 , y+ h/2 - 20 ,7*w/8.0,2*h/3.0);
     }
 
     if(xfont == null){
-      fill(0);
+      fill(50);
       textFont(font);
-    //  textAlign(CENTER);
       text(txt, x + w/2 ,y + h*7/8.0 );
     }else{
       fill(255);

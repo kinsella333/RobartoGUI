@@ -3,5 +3,7 @@ Gin : 2
 Tonic : 5
 
 Description:
-A Smooth mixture of cool gin and bubbly tonic. Served on the rocks, with a lime.
-Great for a warm summer's day, sitting on a porch taking in a beautiful lake view.
+A Smooth mixture of cool gin and bubbly
+tonic. Served on the rocks, with a lime.
+Great for a warm summer's day, sitting on
+a porch taking in a beautiful lake view.

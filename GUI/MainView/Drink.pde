@@ -26,10 +26,10 @@ class Drink{
     }
 
     void getRecipe(){
-      String line, out = "                    Recipe\n";
+      String line, out = "                    Recipe                    \n";
       String[] sLine;
       String bChoice, tempLine = "";
-      boolean recipeRead = false;
+      boolean recipeRead = false, temp = false;
       int choiceN = -1, length = 0, j = 0;
 
       try{
@@ -43,18 +43,7 @@ class Drink{
             }
 
             if(recipeRead){
-              sLine = split(line, " ");
-
-              while(j != sLine.length){
-                tempLine += sLine[j] + " ";
-                j++;
-                if(tempLine.length() > 40){
-                  this.description += tempLine + "\n";
-                  tempLine = "";
-                }
-              }
-              this.description += tempLine;
-              j = 0;
+              this.description += line + "\n";
 
             }else if((sLine = split(line, " ")).length > 0){
               bChoice = sLine[0];

@@ -4,6 +4,7 @@ import processing.event.*;
 import processing.opengl.*; 
 
 import gifAnimation.*; 
+import processing.serial.*; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -19,19 +20,24 @@ public class MainView extends PApplet {
 
 
 
+
 PFont font;
 PImage background;
 PImage choiceImage;
 Gif loadingGIF;
+Serial port;
 
 Button b0, b1, b2, b3, b4, b5, backB, makeB;
 Drink drink0, drink1, drink2, drink3, drink4, drink5;
 Drink choice;
-boolean drinkMenu = false, loadScreen = false;
+boolean drinkMenu = false, loadScreen = false, connected = false;
 int x = 1200, count = 0, temp = 0;
 int basicBC = color(255,255,255,175), menuBC = color(50,120,255,255);
+long last_heartbeat = 0;
 
 static final String bottle0 = "Rum", bottle1 = "Gin", bottle2 = "Whiskey", bottle3 = "Coke", bottle4 = "Tonic";
+
+static final int CMD_HEARTBEAT = 0x40, CMD_HOME = 0x41, CMD_STOP = 0x42, CMD_MANUAL = 0x43, CMD_RECIPE = 0x44, CMD_COMPLETE = 0x45;
 
 public void setup() {
   
@@ -43,10 +49,12 @@ public void setup() {
   textAlign(CENTER);
   imageMode(CENTER);
 
-  drink0 = new Drink("assets/cup1.png",100,100,175,250, "assets/G&T.txt", basicBC);
-  drink1 = new Drink("assets/cup1.png",400,100,175,250, "assets/awfulDrink.txt", basicBC);
-  drink2 = new Drink("assets/cup1.png",700,100,175,250, "assets/G&T.txt", basicBC);
-  drink3 = new Drink("assets/cup1.png",100,450,175,250, "assets/G&T.txt", basicBC);
+  port = new Serial(this, "COM3", 115200);
+
+  drink0 = new Drink("assets/G&T.png",100,100,175,250, "assets/G&T.txt", basicBC);
+  drink1 = new Drink("assets/collegeLongIsland.png",400,100,175,250, "assets/collegeLongIsland.txt", basicBC);
+  drink2 = new Drink("assets/jackNcoke.png",700,100,175,250, "assets/jackNcoke.txt", basicBC);
+  drink3 = new Drink("assets/whiskeyStraight.png",100,450,175,250, "assets/whiskey.txt", basicBC);
   drink4 = new Drink("assets/cup1.png",400,450,175,250, "assets/G&T.txt", basicBC);
   drink5 = new Drink("assets/cup1.png",700,450,175,250, "assets/G&T.txt", basicBC);
  }
@@ -60,14 +68,33 @@ public void draw() {
   }
   if(loadScreen && x < -1000){
     drawLoadScreen();
-    temp++;
   }
-  if(temp > 500){
-    loadScreen = false;
-    drinkMenu = false;
-    x = 1200;
-    count = 0;
-    temp = 0;
+
+  if(port.available() > 0){
+    char c = port.readChar();
+
+    switch(c){
+      case CMD_HEARTBEAT:
+      last_heartbeat = millis();
+      break;
+
+      case CMD_COMPLETE:
+      loadScreen = false;
+      drinkMenu = false;
+      x = 1200;
+      count = 0;
+      temp = 0;
+      break;
+
+      default:
+      break;
+    }
+  }
+  if(millis() - last_heartbeat > 1500){
+      connected = false;
+      //print("Connection lost\n");
+  }else{
+    connected = true;
   }
 
 }
@@ -115,13 +142,12 @@ public void mouseClicked(){
       count = 0;
       loadScreen = true;
 
-      /*Send Drinks*/
-
-      //Send choice.bottleNum
+      port.write(CMD_RECIPE);
+      port.write(choice.bottleNum);
       for(int i = 0; i < choice.recipeOrder.length; i++){
         if(choice.recipeOrder[i] > 0){
-          //Send i
-          //Send choice.recipeOrder
+          port.write(i);
+          port.write(choice.recipeOrder[i]);
         }
       }
   }
@@ -130,7 +156,6 @@ public void mouseClicked(){
 public void drawDrinkMenu(Drink choice){
   if(count == 0){
     choiceImage = loadImage(choice.imgPath);
-    choiceImage.resize(250,300);
   }
   if(count < 23 && !loadScreen){
     x = x - 50;
@@ -147,10 +172,10 @@ public void drawDrinkMenu(Drink choice){
   //Drink Background, and Drink
   fill(255,255,255,200);
   rect(x,100,400,610,7);
-  image(choiceImage, x + 200, 300);
+  image(choiceImage, x + 200, 300, 300, 350);
 
   //Drink Title
-  fill(0);
+  fill(50);
   textFont(createFont("Segoe UI", 35));
   text(choice.name, x + 200 , 600);
 
@@ -164,9 +189,11 @@ public void drawDrinkMenu(Drink choice){
   text(choice.recipe, x + 650, 175);
 
   //Recipe Description
+  textAlign(LEFT);
   fill(255);
   textFont(createFont("Segoe UI", 20));
-  text(choice.description, x + 650, 250 + 40*choice.bottleNum);
+  text(choice.description, x + 450, 250 + 40*choice.bottleNum);
+  textAlign(CENTER);
 
   backB.setPosition(x + 430, 650);
   backB.show();
@@ -252,13 +279,12 @@ class Button{
     noStroke();
     rect(x,y,w,h,7);
     if(img != null){
-      image(img, x + w/2 , y+ h/2 ,w/2,h/2);
+      image(img, x + w/2 , y+ h/2 - 20 ,7*w/8.0f,2*h/3.0f);
     }
 
     if(xfont == null){
-      fill(0);
+      fill(50);
       textFont(font);
-    //  textAlign(CENTER);
       text(txt, x + w/2 ,y + h*7/8.0f );
     }else{
       fill(255);
@@ -306,10 +332,10 @@ class Drink{
     }
 
     public void getRecipe(){
-      String line, out = "                    Recipe\n";
+      String line, out = "                    Recipe                    \n";
       String[] sLine;
       String bChoice, tempLine = "";
-      boolean recipeRead = false;
+      boolean recipeRead = false, temp = false;
       int choiceN = -1, length = 0, j = 0;
 
       try{
@@ -323,18 +349,7 @@ class Drink{
             }
 
             if(recipeRead){
-              sLine = split(line, " ");
-
-              while(j != sLine.length){
-                tempLine += sLine[j] + " ";
-                j++;
-                if(tempLine.length() > 40){
-                  this.description += tempLine + "\n";
-                  tempLine = "";
-                }
-              }
-              this.description += tempLine;
-              j = 0;
+              this.description += line + "\n";
 
             }else if((sLine = split(line, " ")).length > 0){
               bChoice = sLine[0];
