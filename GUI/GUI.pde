@@ -31,7 +31,7 @@ void setup() {
   textAlign(CENTER);
   imageMode(CENTER);
 
-  port = new Serial(this, "COM3", 115200);
+  //port = new Serial(this, "COM3", 115200);
 
   drink0 = new Drink("assets/G&T.png",100,100,175,250, "assets/G&T.txt", basicBC);
   drink1 = new Drink("assets/collegeLongIsland.png",400,100,175,250, "assets/collegeLongIsland.txt", basicBC);
@@ -67,7 +67,15 @@ void draw() {
   if(byoMenu){
     drawBYO();
   }
-
+  if(temp > 200){
+    loadScreen = false;
+    drinkMenu = false;
+    byoMenu = false;
+    temp = 0;
+    count = 0;
+    x = 1200;
+  }
+/*
   if(port.available() > 0){
     char c = port.readChar();
 
@@ -94,7 +102,7 @@ void draw() {
   }else{
     connected = true;
   }
-
+*/
 }
 
 void mouseClicked(){
@@ -134,7 +142,7 @@ void mouseClicked(){
   if(makeB.check_click()){
       count = 0;
       loadScreen = true;
-
+      /*
       port.write(CMD_RECIPE);
       port.write(choice.bottleNum);
       for(int i = 0; i < choice.recipeOrder.length; i++){
@@ -143,6 +151,7 @@ void mouseClicked(){
           port.write(choice.recipeOrder[i]);
         }
       }
+      */
   }
 
   //BYO Menu Buttons
@@ -235,22 +244,22 @@ void mouseClicked(){
               }
               break;
       case bottle1:
-              if(drink5.recipeOrder[0] > 0){
+              if(drink5.recipeOrder[1] > 0){
                 drink5.recipeOrder[1]--;
               }
               break;
       case bottle2:
-              if(drink5.recipeOrder[0] > 0){
+              if(drink5.recipeOrder[2] > 0){
                 drink5.recipeOrder[2]--;
               }
               break;
       case bottle3:
-              if(drink5.recipeOrder[0] > 0){
+              if(drink5.recipeOrder[3] > 0){
                 drink5.recipeOrder[3]--;
               }
               break;
       case bottle4:
-              if(drink5.recipeOrder[0] > 0){
+              if(drink5.recipeOrder[4] > 0){
                 drink5.recipeOrder[4]--;
               }
               break;
@@ -265,6 +274,7 @@ void mouseClicked(){
     choice = drink5;
     choice.getTotalOz();
 
+    /*
     port.write(CMD_RECIPE);
     port.write(choice.bottleNum);
     print(choice.bottleNum);
@@ -274,6 +284,7 @@ void mouseClicked(){
         port.write(choice.recipeOrder[i]);
       }
     }
+    */
   }
 }
 
@@ -364,6 +375,7 @@ void drawLoadScreen(){
 
   image(loadingGIF,500,550);
 
+  temp++;
 }
 
 void drawBYO(){
